@@ -98,7 +98,7 @@ class DatabaseManager:
                 (video_id, title, channel_name, channel_handle, filename)
             )
             conn.commit()
-        self._console.print(f"  [bold cyan]✔ Saved to DB:[/bold cyan]")
+        self._console.print(f"  [bold cyan]✔ Saved to DB[/bold cyan]")
 
     def get_video_info(self, video_id: str) -> Optional[Dict[str, str]]:
         """
