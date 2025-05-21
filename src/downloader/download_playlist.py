@@ -88,18 +88,18 @@ def download_playlist(playlist_info: dict[str, Any],
         new_filepath = ""
 
         # Try 3 times before failing
-        trial_count = 3
-        for trial in range(1, trial_count):
+        trial_count = 10
+        for trial in range(0, trial_count):
             try:
                 new_filepath = convert.convert_to_ogg(filepath)
             except FileConversionError as e:
-                _console.print(f"    🔄 Retrying... ({trial}/{trial_count})")
+                _console.print(f"    🔄 Retrying... ({trial+1}/{trial_count-1})")
                 _console.print(f"    [dim]⏭ Skipping conversion:[/dim] {title} ({video_id})")
             else:
                 break
         
         if new_filepath == "":
-            raise ConversionMaxRetryAttemptError(f"Conversion failed: Max retry attempts reached. (tried {trial_count} times.)")
+            raise ConversionMaxRetryAttemptError(f"Conversion failed: Max retry attempts reached. (tried {trial_count-1} times.)")
 
         filename = os.path.basename(new_filepath)
         metadata.update_metadata(new_filepath, title, video_id, channel_name, channel_handle, db_manager)
@@ -132,7 +132,7 @@ def download_video(filepath: str,
     success = False
     original_exception = None
 
-    for trial in range(1, trial_count+1):
+    for trial in range(0, trial_count+1):
         try:
             # Create the directory if it doesn't exist
             os.makedirs(os.path.join(config.DOWN_DIR, string_utils.clean_channel_name(channel_name)), exist_ok=True)
@@ -157,14 +157,14 @@ def download_video(filepath: str,
         except Exception as e:
             original_exception = e
             _console.print(f"    [red]✖ Error:[/red] {e}")
-            _console.print(f"    🔄 Retrying... ({trial}/{trial_count})")
+            _console.print(f"    🔄 Retrying... ({trial+1}/{trial_count-1})")
         else:
             success = True
             break
     
     if not success:
         raise DownloadError(
-            f"Download failed: Max retry attempts reached. (tried {trial_count} times.)",
+            f"Download failed: Max retry attempts reached. (tried {trial_count-1} times.)",
             reason="Download retrial reached max retrial count",
             original_exception=original_exception
         )
