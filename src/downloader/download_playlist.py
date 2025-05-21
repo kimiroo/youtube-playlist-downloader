@@ -72,7 +72,7 @@ def download_playlist(playlist_info: dict[str, Any],
         _console.print(f"\n[bold green]⬇ Downloading {title} ({video_id}) ({idx}/{len(playlist_info["entries"])})[/bold green]")
 
         if db_manager.is_downloaded(video_id):
-            _console.print(f"    [dim]⏭ Skipping download:[/dim] {title} ({video_id})")
+            _console.print(f"  [dim]⏭ Skipping download[/dim]")
             continue
 
         try:
@@ -82,7 +82,7 @@ def download_playlist(playlist_info: dict[str, Any],
                             trial_count=10,
                             console=_console)
         except DownloadError:
-            _console.print(f"    [dim]⏭ Skipping download:[/dim] {title} ({video_id})")
+            _console.print(f"  [dim]⏭ Skipping download due to error[/dim]")
             continue
 
         new_filepath = ""
@@ -94,7 +94,7 @@ def download_playlist(playlist_info: dict[str, Any],
                 new_filepath = convert.convert_to_ogg(filepath)
             except FileConversionError:
                 _console.print(f"    🔄 Retrying... ({trial+1}/{trial_count})")
-                _console.print(f"    [dim]⏭ Skipping conversion:[/dim] {title} ({video_id})")
+                _console.print(f"  [dim]⏭ Skipping conversion due to error[/dim]")
             else:
                 break
         
@@ -140,23 +140,23 @@ def download_video(filepath: str,
             # Delete target file if exists
             if os.path.exists(filepath):
                 os.remove(filepath)
+            
+            # Delete temp (.part) file if exists
+            if os.path.exists(filepath + '.part'):
+                os.remove(filepath + '.part')
 
             # Download video
             with yt_dlp.YoutubeDL({
                 "format": "bestaudio[ext=webm]/best",
                 "outtmpl": filepath,
                 "noplaylist": True,
-                "quiet": True,
-                "writedescription": False,
-                "writeinfojson": False,
-                "extract_flat": False,
-                "extract_thumbnail": False,
+                "quiet": True
             }) as ydl:
-                video_info = ydl.extract_info(video_url) # type: ignore
-                _console.print(f"    [bold cyan]✔ Downloaded:[/bold cyan] {video_info.get('title')} ({video_info.get('id')})") # type: ignore
+                ydl.download(video_url) # type: ignore
+                _console.print(f"  [bold cyan]✔ Downloaded") # type: ignore
         except Exception as e:
             original_exception = e
-            _console.print(f"    [red]✖ Error:[/red] {e}")
+            _console.print(f"  [red]✖ Error:[/red] {e}")
             _console.print(f"    🔄 Retrying... ({trial+1}/{trial_count})")
         else:
             success = True

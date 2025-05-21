@@ -40,11 +40,11 @@ def convert_to_ogg(filepath: str, console: Optional[RichConsole] = None) -> str:
         ffmpeg.input(filepath).output(new_filepath, format="ogg", c="copy").run(overwrite_output=True, quiet=True) # type: ignore
         os.remove(filepath)
 
-        _console.print(f"    [bold cyan]✔ Converted to OGG[/bold cyan]")
+        _console.print(f"  [bold cyan]✔ Converted to OGG[/bold cyan]")
         return new_filepath
     
     except Exception as e:
-        _console.print(f"    [red]✖ Conversion error:[/red] {e}")
+        _console.print(f"  [red]✖ Conversion error:[/red] {e}")
         raise FileConversionError(input_path=filepath,
                                   output_path=new_filepath,
                                   original_exception=e)

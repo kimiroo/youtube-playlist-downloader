@@ -84,15 +84,15 @@ def get_channel_profile_url(channel_handle: str, console: Optional[RichConsole] 
         thumbnails = info.get("thumbnails", []) # type: ignore
         for thumbnail in thumbnails: # type: ignore
             if thumbnail.get("id") == "avatar_uncropped": # type: ignore
-                _console.print(f"    [bold cyan]✔ Successfully fetched channel profile for:[/bold cyan] {channel_handle}")
+                _console.print(f"  [bold cyan]✔ Successfully fetched channel profile for:[/bold cyan] {channel_handle}")
                 return thumbnail.get("url") # type: ignore
         if thumbnails:
             # fallback to the last thumbnail if avatar_uncropped is not found
             return thumbnails[-1].get("url") # type: ignore
         
-        _console.print(f"    [red]✖ Error fetching channel profile:[/red] No profile available.")
+        _console.print(f"  [red]✖ Error fetching channel profile:[/red] No profile available.")
         raise NoProfileImageError(channel_handle=channel_handle)
     
     except Exception as e:
-        _console.print(f"    [red]✖ Error fetching channel profile image:[/red] {e}")
+        _console.print(f"  [red]✖ Error fetching channel profile image:[/red] {e}")
         raise GetProfileImageURLError(channel_handle=channel_handle, original_exception=e)
