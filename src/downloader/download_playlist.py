@@ -79,7 +79,7 @@ def download_playlist(playlist_info: dict[str, Any],
             download_video(filepath=filepath,
                             video_url=entry["url"],
                             channel_name=channel_name,
-                            trial_count=3,
+                            trial_count=10,
                             console=_console)
         except DownloadError:
             _console.print(f"    [dim]⏭ Skipping download:[/dim] {title} ({video_id})")
@@ -88,18 +88,18 @@ def download_playlist(playlist_info: dict[str, Any],
         new_filepath = ""
 
         # Try 3 times before failing
-        trial_count = 10
+        trial_count = 3
         for trial in range(0, trial_count):
             try:
                 new_filepath = convert.convert_to_ogg(filepath)
-            except FileConversionError as e:
-                _console.print(f"    🔄 Retrying... ({trial+1}/{trial_count-1})")
+            except FileConversionError:
+                _console.print(f"    🔄 Retrying... ({trial+1}/{trial_count})")
                 _console.print(f"    [dim]⏭ Skipping conversion:[/dim] {title} ({video_id})")
             else:
                 break
         
         if new_filepath == "":
-            raise ConversionMaxRetryAttemptError(f"Conversion failed: Max retry attempts reached. (tried {trial_count-1} times.)")
+            raise ConversionMaxRetryAttemptError(f"Conversion failed: Max retry attempts reached. (tried {trial_count} times.)")
 
         filename = os.path.basename(new_filepath)
         metadata.update_metadata(new_filepath, title, video_id, channel_name, channel_handle, db_manager)
@@ -157,14 +157,14 @@ def download_video(filepath: str,
         except Exception as e:
             original_exception = e
             _console.print(f"    [red]✖ Error:[/red] {e}")
-            _console.print(f"    🔄 Retrying... ({trial+1}/{trial_count-1})")
+            _console.print(f"    🔄 Retrying... ({trial+1}/{trial_count})")
         else:
             success = True
             break
     
     if not success:
         raise DownloadError(
-            f"Download failed: Max retry attempts reached. (tried {trial_count-1} times.)",
+            f"Download failed: Max retry attempts reached. (tried {trial_count} times.)",
             reason="Download retrial reached max retrial count",
             original_exception=original_exception
         )
