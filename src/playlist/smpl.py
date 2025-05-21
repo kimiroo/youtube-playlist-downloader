@@ -41,8 +41,8 @@ def generate_smpl(playlist_info: dict[str, Any],
         db_info = db_manager.get_video_info(video_id)
         if db_info:
             videos.append({
-                "artist": db_info["uploader"],
-                "info": f"{config.SMPL_PREFIX}{string_utils.clean_channel_name(db_info['uploader'])}/{db_info['filename']}",
+                "artist": db_info["channel_name"],
+                "info": f"{config.SMPL_PREFIX}{string_utils.clean_channel_name(db_info['channel_name'])}/{db_info['filename']}",
                 "order": len(videos) if not reverse else 0,
                 "title": playlist_name if playlist_name else db_info["title"],
                 "type": 65537
