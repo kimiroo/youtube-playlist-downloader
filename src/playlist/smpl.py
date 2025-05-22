@@ -55,7 +55,7 @@ def generate_smpl(playlist_info: dict[str, Any],
 
     smpl_data: dict[str, Any] = {
         "members": videos,
-        "name": playlist_info['title'],
+        "name": playlist_name,
         "recentlyPlayedDate": 0,
         "sortBy": 4,
         "version": 1
