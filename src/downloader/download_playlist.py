@@ -44,15 +44,20 @@ def get_playlist_info(url: str, console: Optional[RichConsole] = None) -> dict[s
 
 def download_playlist(playlist_info: dict[str, Any],
                       db_manager: DatabaseManager,
-                      console: Optional[RichConsole] = None) -> None:
+                      console: Optional[RichConsole] = None) -> dict[str, Any]:
     """
     Download playlist as audio files and convert to .ogg file.
 
     Args:
         playlist_info (dict): Playlist object
         db_manager: DatabaseManager instance
+    
+    Returns:
+        Dict[str, Any]: Playlist object
     """
     _console = console if console else RichConsole()
+    new_playlist_info = playlist_info
+    new_playlist_info["entries"] = []
 
     for idx, entry in enumerate(playlist_info["entries"], start=1):
         video_id = entry["id"]
@@ -104,6 +109,9 @@ def download_playlist(playlist_info: dict[str, Any],
         filename = os.path.basename(new_filepath)
         metadata.update_metadata(new_filepath, title, video_id, channel_name, channel_handle, db_manager)
         db_manager.save_video_info(video_id, title, channel_name, channel_handle, filename)
+        new_playlist_info["entries"].append(entry)
+    
+    return new_playlist_info
 
 def download_video(filepath: str,
                    video_url: str,
