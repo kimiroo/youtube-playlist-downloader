@@ -39,14 +39,19 @@ def generate_smpl(playlist_info: dict[str, Any],
             continue
         video_id = entry["id"]
         db_info = db_manager.get_video_info(video_id)
+        
         if db_info:
-            videos.append({
-                "artist": db_info["channel_name"],
-                "info": f"{config.SMPL_PREFIX}{string_utils.clean_channel_name(db_info['channel_name'])}/{db_info['filename']}",
-                "order": len(videos) if not reverse else 0,
-                "title": playlist_name if playlist_name else db_info["title"],
-                "type": 65537
-            })
+            is_video_exist = os.path.exists(os.path.join(config.DOWN_DIR,
+                                                         string_utils.clean_channel_name(db_info['channel_name']),
+                                                         db_info['filename']))
+            if is_video_exist:
+                videos.append({
+                    "artist": db_info["channel_name"],
+                    "info": f"{config.SMPL_PREFIX}{string_utils.clean_channel_name(db_info['channel_name'])}/{db_info['filename']}",
+                    "order": len(videos) if not reverse else 0,
+                    "title": playlist_name if playlist_name else db_info["title"],
+                    "type": 65537
+                })
 
     if reverse:
         videos.reverse()
