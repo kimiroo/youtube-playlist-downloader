@@ -49,4 +49,4 @@ class Application:
 
         new_playlist_info = download_playlist.download_playlist(playlist_info, self.db_manager)
         smpl.generate_smpl(new_playlist_info, final_playlist_name, self.db_manager, reverse)
-        self.console.print("[bold green]✔ All done![/bold green]")
+        self.console.print("[bold green]✔ All done![/bold green]\n")

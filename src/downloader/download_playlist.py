@@ -56,8 +56,7 @@ def download_playlist(playlist_info: dict[str, Any],
         Dict[str, Any]: Playlist object
     """
     _console = console if console else RichConsole()
-    new_playlist_info = playlist_info
-    new_playlist_info["entries"] = []
+    new_entries = []
 
     for idx, entry in enumerate(playlist_info["entries"], start=1):
         video_id = entry["id"]
@@ -74,10 +73,11 @@ def download_playlist(playlist_info: dict[str, Any],
         filename = f"{string_utils.clean_filename(title)} ({video_id}).webm"
         filepath = os.path.join(config.DOWN_DIR, string_utils.clean_channel_name(channel_name), filename)
 
-        _console.print(f"\n[bold green]⬇ Downloading {title} ({video_id}) ({idx}/{len(playlist_info["entries"])})[/bold green]")
+        _console.print(f"[bold green]⬇ Downloading {title} ({video_id}) ({idx}/{len(playlist_info["entries"])})[/bold green]")
 
         if db_manager.is_downloaded(video_id):
-            _console.print(f"  [dim]⏭ Skipping download[/dim]")
+            new_entries.append(entry)
+            _console.print(f"  [dim]⏭ Skipping download[/dim]\n")
             continue
 
         try:
@@ -109,9 +109,12 @@ def download_playlist(playlist_info: dict[str, Any],
         filename = os.path.basename(new_filepath)
         metadata.update_metadata(new_filepath, title, video_id, channel_name, channel_handle, db_manager)
         db_manager.save_video_info(video_id, title, channel_name, channel_handle, filename)
-        new_playlist_info["entries"].append(entry)
+        new_entries.append(entry)
+        _console.print("")
     
-    return new_playlist_info
+    # Generate new playlist object from new_entries
+    playlist_info["entries"] = new_entries
+    return playlist_info
 
 def download_video(filepath: str,
                    video_url: str,
